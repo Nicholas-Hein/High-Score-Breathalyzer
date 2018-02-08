@@ -9,7 +9,7 @@ Delight your friends by having them compete to set the high score BAC for your b
 - Test your score against the reigning champion, and celebrate their defeat with a fun, 5-LED animation and OLED display.
 - Save your high score between power cycles by saving to the Atmega328p's FIFO.
 
-## Disclaimer:
+## Disclaimers:
 - This code is very preliminary, and there are a few known bugs.
   - E.G. At the moment, the high score does not yet save to FIFO
 - This code is very poorly organized.  I plan on pushing some updates in the future completely reorganizing the program (This was my very first Atmel based project, and I was just beginning to teach myself C)
@@ -18,3 +18,9 @@ Delight your friends by having them compete to set the high score BAC for your b
 - **This is not an excuse for heavy drinking, and I do not accept any liability for whoever uses these resources**
 - _However, this toy **could** be used as a tool to measure BAC and promote healthy drinking habits (stop someone from driving home)._
 - Enjoy! These resources are for anybody! Modify, create, or reference, but I would appreciate a little credit when necessary :wink:.
+
+
+#### Note:
+I used Tinusaur's SSD1306xLED I2C OLED framework to control my OLED display.
+
+Check it out [here](https://tinusaur.org/projects/ssd1306xled/)!
