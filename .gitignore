@@ -1,0 +1,6 @@
+# Ignore the build and lib dirs
+build/*
+buildtest/*
+
+# Ignore any executables
+bin/*
