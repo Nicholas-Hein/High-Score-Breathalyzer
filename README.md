@@ -22,5 +22,6 @@ Delight your friends by having them compete to set the high score BAC for your b
 ### Module Layout
 - Microcontroller (Atmega8)
 - Bluetooth (HC-06)
+- Breathalyzer (MQ-3)
 - Power Source (5VDC)
 - Flashing Port (USBASP)
