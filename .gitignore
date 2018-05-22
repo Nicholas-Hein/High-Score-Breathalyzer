@@ -3,4 +3,4 @@ build/*
 buildtest/*
 
 # Ignore any executables
-bin/*
+atmega8/*

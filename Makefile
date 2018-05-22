@@ -14,17 +14,34 @@ MAINNAME := main
 SRCDIR := src
 BUILDDIR := build
 BINDIR := $(AVR)
+LIBDIR := lib
 TARGET := $(BINDIR)/$(PROJECTNAME)
 
 # Compiler
 CC := avr-gcc
 SIZE := avr-size
+OBJCOPY := avr-objcopy
+OBJDUMP := avr-objdump
 AVR_PROGRAMMER := -c avrdude -P usb
-INC := -I include
-LIB := -B lib
-CFLAGS := -mmcu=$(AVR) -std=c99 -g
+INC := -I"include"
+LIB := -B $(LIBDIR) -B $(BINDIR)
+CFLAGS :=
 
 # Compiler Optimization
+# 	Select the microcontroller
+CFLAGS += -mmcu=$(AVR)
+#	Select the standard library
+CFLAGS += -std=c99
+#	Specify the language
+CFLAGS += -x c
+#	No debugging options
+CFLAGS += -g
+#	Compile and assemble but do not link
+CFLAGS += -c
+#	Add includes
+CFLAGS += $(INC)
+#	Add bytecode
+CFLAGS += $(LIB)
 #	Warnings and errors
 CFLAGS += -Wall -pedantic-errors -Werror
 #	Make function calls efficient
@@ -41,20 +58,42 @@ CFLAGS += -fpack-struct
 CFLAGS += -fshort-enums
 #	Limit size of functions inlined
 CFLAGS += -finline-limit=3
+#	Generate make dependencies and compile
+CFLAGS += -MD
+#	Generate phony targets for all headers
+CFLAGS += -MP
+
 
 # Configuration Macros
-#CFLAGS += -D DEBUG
+# 	Define the debug symbol
+CFLAGSDEBUG := $(CFLAGS) -DDEBUG
 
-#Linker Flags
+
+# Linker Flags
 LDFLAGS := -lc -mmcu=$(AVR)
 #	Garbage collect unused sections
 LDFLAGS += -Wl,--gc-sections
-#	Generate MAP file
-LDFLAGS += -Wl,-Map,$(PROJECTNAME).map
+#	Print a linker map to stdout
+LDFLAGS += -Wl,-Map=$(TARGET).map
 #	Print garbage collected sections
 LDFLAGS += -Wl,--print-gc-sections
 #	Performs global optimization
 LDFLAGS += -Wl,--relax
+#	Correct circular includes (Start)
+LDFLAGS += -Wl,--start-group
+#	Add libm
+LDFLAGS += -Wl,-lm
+#	Correct circular includes (End)
+LDFLAGS += -Wl,--end-group
+#	Add bytecode
+LDFLAGS += $(LIB)
+
+
+CP1FLAGS := -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures
+CP2FLAGS := -j .eeprom --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0 --no-change-warnings -O ihex
+ODFLAGS := -h -S
+CP3FLAGS := -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures
+SZFLAGS :=
 
 # Files
 SRCEXT := c
@@ -63,28 +102,28 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
 
 
-$(TARGET)-o.hex : $(OBJECTS)
-	@echo " Building...";
-	@echo "   $(CC) $(LDFLAGS) $(OBJECTS) -o $(TARGET)-o.elf"; $(CC) $(LDFLAGS) $(OBJECTS) -o $(TARGET)-o.elf
-	@echo " Converting objects...";
-	@echo "   avr-objcopy -O ihex $(TARGET)-o.elf $(TARGET)-o.hex"; avr-objcopy -O ihex $(TARGET)-o.elf $(TARGET)-o.hex
-	@echo " Getting size...";
-	@echo "   $(SIZE) --format=berkeley $(TARGET)-o.elf"; $(SIZE) --format=berkeley $(TARGET)-o.elf
-	@echo "   $(SIZE) --format=avr --mcu=$(AVR) $(TARGET)-o.elf"; $(SIZE) --format=avr --mcu=$(AVR) $(TARGET)-o.elf
 
-$(TARGET).hex: $(SOURCES)
-	@echo " Building...";
-	@echo "   $(CC) $(CFLAGS) --combine -fwhole-program $(LDFLAGS) $(SOURCES) -o $(TARGET).elf"; $(CC) $(CFLAGS) --combine -fwhole-program $(LDFLAGS) $(SOURCES) -o $(TARGET).elf
-	@echo "Converting objects...";
-	@echo "   avr-objcopy -O ihex $(TARGET).elf $(TARGET).hex"; avr-objcopy -O ihex $(TARGET).elf $(TARGET).hex
-	@echo " Getting size...";
-	@echo "   $(SIZE) --format=berkeley $(TARGET).elf"; $(SIZE) --format=berkeley $(TARGET).elf
-	@echo "   $(SIZE) --format=avr --mcu=$(AVR) $(TARGET).elf"; $(SIZE) --format=avr --mcu=$(AVR) $(TARGET).elf
+./$(BUILDDIR)/%.o: $(SOURCES)
+	@echo " Building file: '$<'..."
+	$(CC) $(CFLAGS) -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -o "$@" "$<"
+	@echo "   Finished building '$<'!"
 
-all: $(TARGET).hex
+$(TARGET).elf: $(OBJECTS)
+	@echo " Building target: '$@'..."
+	$(CC) $(LDFLAGS) -o$(TARGET).elf $(OBJECTS)
+	@echo " Finished building target: '$@'!"
+	@echo " Dumping..."
+	$(OBJCOPY) $(CP1FLAGS) "$(TARGET).elf" "$(TARGET).hex"
+	$(OBJCOPY) $(CP2FLAGS) "$(TARGET).elf" "$(TARGET).eep" || exit 0
+	$(OBJDUMP) $(ODFLAGS) "$(TARGET).elf" > "$(TARGET).lss"
+	$(OBJCOPY) $(CP3FLAGS) "$(TARGET).elf" "$(TARGET).srec"
+	$(SIZE) "$(TARGET).elf"
+	@echo " Done dumping!"
 
-program: $(TARGET)-o.hex
-	@echo " Compiling...";
+all: $(TARGET).elf
+
+program: $(TARGET).hex
+	@echo " Programming...";
 	@echo "   avrdude $(AVR_PROGRAMMER) -p $(AVR) $(LIB) -e -U flash:w:$(TARGET)-o.hex"; avrdude $(AVR_PROGRAMMER) -p $(AVR) $(LIB) -e -U flash:w:$(TARGET)-o.hex
 
 fuses:
@@ -93,8 +132,10 @@ fuses:
 
 clean:
 	@echo " Cleaning..."
-	@echo "   $(RM) -r $(BUILDDIR)/* $(BINDIR)/* $(BUILDTESTDIR)/*"; $(RM) -r $(BUILDDIR)/* $(BINDIR)/* $(BUILDTESTDIR)/*
+	$(RM) -r $(BUILDDIR)/* $(BINDIR)/*
+	@echo " Done cleaning!"
 
 .PHONY: clean
 .PHONY: all
 .PHONY: fuses
+.PHONY: program
