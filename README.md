@@ -17,3 +17,10 @@ Delight your friends by having them compete to set the high score BAC for your b
 - **This is not an excuse for heavy drinking, and I do not accept any liability for whoever uses these resources**.
 - _However, this toy **could** be used as a tool to measure BAC and promote healthy drinking habits (e.g. stop someone from driving home)._
 - Enjoy! These resources are for anybody! Modify, create, or reference, but I would appreciate a little credit when necessary :wink:.
+
+## Project Overview
+### Module Layout
+- Microcontroller (Atmega8)
+- Bluetooth (HC-06)
+- Power Source (5VDC)
+- Flashing Port (USBASP)
