@@ -6,9 +6,17 @@
 #include <avr/util/setbaud.h>
 
 
+FILE USART0_OStream = FDEV_SETUP_STREAM(usart0SendByte, NULL, _FDEV_SETUP_WRITE);
+FILE USART0_IStream = FDEV_SETUP_STREAM(NULL, usart0USART0ReceiveByte, _FDEV_SETUP_READ);
+
 
 uint8_t BluetoothInitialize (void)
 {
+    static uint8_t bluetoothInitState = 0x00;
+    if (bluetoothInitState) {
+        return 0x00;
+    }
+
     usartInitialize();
 
     char ack_baud [ACK_BLUETOOTH_BAUD_LENGTH] = ACK_BLUETOOTH_BAUD;
@@ -29,6 +37,7 @@ uint8_t BluetoothInitialize (void)
         return (1 << RQST_BLUETOOTH_PIN_INDEX);
     }
 
+    bluetoothInitState = 0x01;
     return 0x00;
 }
 

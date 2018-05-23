@@ -3,7 +3,7 @@
 #define BLUETOOTHCONTROL_H
 
 #ifndef F_CPU
-#define F_CPU 1000000UL
+#define F_CPU 16000000UL
 #endif
 
 #ifndef BAUD
@@ -61,7 +61,7 @@ void usart0SendByte (char data, FILE *stream);
 char usart0ReceiveByte (FILE *stream);
 
 
-FILE USART0_OStream = FDEV_SETUP_STREAM(usart0SendByte, NULL, _FDEV_SETUP_WRITE);
-FILE USART0_IStream = FDEV_SETUP_STREAM(NULL, usart0USART0ReceiveByte, _FDEV_SETUP_READ);
+extern FILE USART0_OStream;
+extern FILE USART0_IStream;
 
 #endif
