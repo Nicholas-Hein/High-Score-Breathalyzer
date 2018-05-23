@@ -6,8 +6,7 @@
 int main(void)
 {
     while (1) {
-        Initialize();
-        uint8_t initcode = BluetoothInitialize();
+        uint8_t initcode = Initialize();
         if (initcode == 0x00) {
             Life();
         } else {
@@ -16,9 +15,14 @@ int main(void)
     }
 }
 
-void Initialize (void)
+uint8_t Initialize (void)
 {
-    
+    uint8_t initcode = 0x00;
+    initcode |= BluetoothInitialize();
+    PowerSourceInitialize();
+    EthanolSensorInitialize();
+
+    return initcode;
 }
 
 void Life (void)
@@ -31,11 +35,41 @@ void Life (void)
 
 void Activity (void)
 {
+    BluetoothSend({ ACK, OVER });
     while (BluetoothIsPaired()) {
-        BluetoothSend({ ACK });
-        //Activity
-        BluetoothSend({ NACK });
+        BluetoothSend({ RDY, OVER });
+
+        char *cmd;
+        if (BluetoothReceive(cmd)) {
+            ExecuteCommand(cmd);
+        }
     }
+    BluetoothSend({ NACK, OVER });
+}
+
+void ExecuteCommand (char *cmd)
+{
+    if (cmd[0] == CMD_OK) {
+        BluetoothSend({ ACK, OVER });
+    } else if (cmd[0] == CMD_MEASUREBAC) {
+        double val = EthanolSensorMeasureBAC();
+        TransmitDouble(val);
+    } else if (cmd[0] == CMD_MEASUREBAT) {
+        double val = PowerSourceMeasureBattery();
+        TransmitDouble(val);
+    } else {
+        BluetoothSend({ ERR, OVER });
+    }
+}
+
+void TransmitDouble (double *d)
+{
+    size_t dataSize = sizeof(double) + 1;
+    char *data = (char *)malloc(dataSize);
+    memcpy(d, data, sizeof(double));
+    data[dataSize - 1] = OVER;
+
+    BluetoothSend(data);
 }
 
 void Standby (void)

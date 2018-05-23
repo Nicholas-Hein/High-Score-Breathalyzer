@@ -5,7 +5,6 @@
 void PowerSourceInitialize (void)
 {
     static uint8_t pwrInitState = 0x00;
-
     if (pwrInitState) {
         return;
     }
@@ -19,7 +18,7 @@ void PowerSourceInitialize (void)
 double PowerSourceMeasureBattery (void)
 {
     ADMUX &= ~(0x0F);       // Select analog channel
-    ADCSRA |= (1 << ADSC);  // Start ADC conversion
+    ADCSRA |= (1 << ADSC);  // Start ADC conversion (ADC1)
     // Wait for conversion to complete
     while (ADCSRA & (1 << ADSC)) ;
     return (double)ADCW / 1023.0;
