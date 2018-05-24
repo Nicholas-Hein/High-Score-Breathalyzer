@@ -66,7 +66,7 @@ void TransmitDouble (double *d)
 {
     size_t dataSize = sizeof(double) + 1;
     char *data = (char *)malloc(dataSize);
-    memcpy(d, data, sizeof(double));
+    memcpy(data, d, sizeof(double));
     data[dataSize - 1] = OVER;
 
     BluetoothSend(data);
