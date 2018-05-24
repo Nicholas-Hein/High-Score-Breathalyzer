@@ -55,7 +55,7 @@ void unloadScores (void)
     uint8_t dataSize = sizeof(double) + 1;
     double *scores = ReadScores();
     unsigned char val [dataSize - 1];
-    unsigned char *msg = malloc(dataSize);
+    unsigned char *msg = (unsigned char *)malloc(dataSize);
     msg = val;
     msg[dataSize - 1] = RDY;
 
@@ -64,34 +64,33 @@ void unloadScores (void)
         BluetoothSend(*msg);
     }
 
-    BluetoothSend({ OVER }); // I don't think this is valid
+    BluetoothSend({ OVER });
 }
 
 void ExecuteCommand (char *cmd)
 {
     if (cmd[0] == CMD_OK) {
-        BluetoothSend({ ACK, OVER }); // I don't think this is valid
+        BluetoothSend({ ACK, OVER });
     } else if (cmd[0] == CMD_MEASUREBAC) {
         double val = EthanolSensorMeasureBAC();
-        TransmitDouble(val);
+        BluetoothSend(ConvertDouble(val));
     } else if (cmd[0] == CMD_MEASUREBAT) {
         double val = PowerSourceMeasureBattery();
-        TransmitDouble(val);
+        BluetoothSend(ConvertDouble(val));
     } else if (cmd[0] == CMD_UNLOADSCORES) {
         unloadScores();
     } else {
-        BluetoothSend({ ERR, OVER }); // I don't think this is valid
+        BluetoothSend({ ERR, OVER });
     }
 }
 
-void TransmitDouble (double *d)
+unsigned char *ConvertDouble (double *d)
 {
     size_t dataSize = sizeof(double) + 1;
-    char *data = (char *)malloc(dataSize);
+    unsigned char *data = (unsigned char *)malloc(dataSize);
     memcpy(data, d, sizeof(double));
     data[dataSize - 1] = OVER;
-
-    BluetoothSend(data);
+    return data;
 }
 
 void Standby (void)

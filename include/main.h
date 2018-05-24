@@ -28,6 +28,6 @@ void Activity (void);
 void Standby (void);
 
 void ExecuteCommand (char *cmd);
-void TransmitDouble (double *d);
+unsigned char *ConvertDouble (double *d);
 
 #endif
