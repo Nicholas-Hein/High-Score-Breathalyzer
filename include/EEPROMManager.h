@@ -11,4 +11,9 @@
 // Lowest score is latest
 // Top 24 are highest
 
+
+double *ReadScores (void);
+void AddScore (double score);
+
+
 #endif

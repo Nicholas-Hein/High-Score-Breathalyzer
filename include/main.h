@@ -13,6 +13,7 @@
 #define CMD_OK 0x01
 #define CMD_MEASUREBAC 0x02
 #define CMD_MEASUREBAT 0x03
+#define CMD_UNLOADSCORES 0x04
 
 
 

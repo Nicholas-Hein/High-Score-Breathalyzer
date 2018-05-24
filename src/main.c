@@ -1,4 +1,7 @@
 #include "BluetoothControl.h"
+#include "EthanolSensorControl.h"
+#include "PowerSourceControl.h"
+#include "EEPROMManager.h"
 #include "main.h"
 
 #include <util/delay.h>
@@ -47,18 +50,37 @@ void Activity (void)
     BluetoothSend({ NACK, OVER });
 }
 
+void unloadScores (void)
+{
+    uint8_t dataSize = sizeof(double) + 1;
+    double *scores = ReadScores();
+    unsigned char val [dataSize - 1];
+    unsigned char *msg = malloc(dataSize);
+    msg = val;
+    msg[dataSize - 1] = RDY;
+
+    for (int i = 0; i < EEPROM_SCORE_SIZE; i++) {
+        memcpy(&val, &(scores[i]), sizeof(double));
+        BluetoothSend(*msg);
+    }
+
+    BluetoothSend({ OVER }); // I don't think this is valid
+}
+
 void ExecuteCommand (char *cmd)
 {
     if (cmd[0] == CMD_OK) {
-        BluetoothSend({ ACK, OVER });
+        BluetoothSend({ ACK, OVER }); // I don't think this is valid
     } else if (cmd[0] == CMD_MEASUREBAC) {
         double val = EthanolSensorMeasureBAC();
         TransmitDouble(val);
     } else if (cmd[0] == CMD_MEASUREBAT) {
         double val = PowerSourceMeasureBattery();
         TransmitDouble(val);
+    } else if (cmd[0] == CMD_UNLOADSCORES) {
+        unloadScores();
     } else {
-        BluetoothSend({ ERR, OVER });
+        BluetoothSend({ ERR, OVER }); // I don't think this is valid
     }
 }
 

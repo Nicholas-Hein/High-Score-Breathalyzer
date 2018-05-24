@@ -1,5 +1,6 @@
 
 #include "ADC.h"
+#include "EEPROMManager.h"
 #include "EthanolSensorControl.h"
 
 #include <avr/math.h>
@@ -49,6 +50,7 @@ double EthanolSensorMeasureBAC (void)
         bac = -1.0;
     } else {
         bac = ppm / 2600.0;
+        AddScore(bac);
     }
     return bac;
 }
