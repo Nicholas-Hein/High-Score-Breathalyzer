@@ -49,19 +49,10 @@
 
 
 
-uint8_t BluetoothInitialize (void);
-uint8_t BluetoothIsPaired (void);
-uint8_t confirmAcknowledge (char *key, uint8_t size);
+unsigned char BluetoothInitialize (void);
+unsigned char BluetoothIsPaired (void);
 
-uint8_t BluetoothSend (char data);
-uint8_t BluetoothReceive (char *data);
-
-void usartInitialize (void);
-void usart0SendByte (char data, FILE *stream);
-char usart0ReceiveByte (FILE *stream);
-
-
-extern FILE USART0_OStream;
-extern FILE USART0_IStream;
+unsigned char BluetoothSend (char *data);
+unsigned char BluetoothReceive (char *data);
 
 #endif

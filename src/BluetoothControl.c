@@ -5,14 +5,65 @@
 #include <avr/avr/io.h>
 #include <avr/util/setbaud.h>
 
+int usart0SendByte (char data, FILE *stream)
+{
+    if (data == '\n') {
+        usart0SendByte('\r', stream);
+    }
+    while (!(UCSRA & (1 << UDRE))) ;
+    UDR = data;
+    return 0;
+}
+
+int usart0ReceiveByte (FILE *stream)
+{
+    while (!(UCSRA & (1 << RXC))) ;
+    return UDR;
+}
 
 FILE USART0_OStream = FDEV_SETUP_STREAM(usart0SendByte, NULL, _FDEV_SETUP_WRITE);
-FILE USART0_IStream = FDEV_SETUP_STREAM(NULL, usart0USART0ReceiveByte, _FDEV_SETUP_READ);
+FILE USART0_IStream = FDEV_SETUP_STREAM(NULL, usart0ReceiveByte, _FDEV_SETUP_READ);
 
-
-uint8_t BluetoothInitialize (void)
+void usartInitialize (void)
 {
-    static uint8_t bluetoothInitState = 0x00;
+    UBRRH = UBRRH_VALUE;
+    UBRRL = UBRRL_VALUE;
+
+#if USE_2X
+    UCSRA |= (1 << U2X);
+#else
+    UCSRA &= ~(1 << U2X);
+#endif
+
+    UCSRC = (1 << UCSZ1) | (1 << UCSZ0);     // 8-bit data
+    UCSRB = (1 << RXEN) | (1 << TXEN);       // Enable RX and TX
+
+    stdout = &USART0_OStream;
+    stdin = &USART0_IStream;
+}
+
+unsigned char confirmAcknowledge (char *key, unsigned char size)
+{
+    unsigned char index = 0;
+    unsigned char count = 0;
+
+    while (index < size && count < CONFIRM_ACK_TIMEOUT) {
+        if (key[index] == getchar()) {
+            index++;
+        } else {
+            index = 0;
+        }
+        count++;
+    }
+
+    return (unsigned char)(count == CONFIRM_ACK_TIMEOUT);
+}
+
+
+
+unsigned char BluetoothInitialize (void)
+{
+    static unsigned char bluetoothInitState = 0x00;
     if (bluetoothInitState) {
         return 0x00;
     }
@@ -41,7 +92,7 @@ uint8_t BluetoothInitialize (void)
     return 0x00;
 }
 
-uint8_t BluetoothIsPaired (void)
+unsigned char BluetoothIsPaired (void)
 {
     char ack [ACK_BLUETOOTH_PAIRED_LENGTH] = ACK_BLUETOOTH_PAIRED;
     puts(RQST_BLUETOOTH_PAIRED);
@@ -51,80 +102,27 @@ uint8_t BluetoothIsPaired (void)
     return 0x01;
 }
 
-uint8_t BluetoothSend (char *data)
+unsigned char BluetoothSend (char *data)
 {
     if (!BluetoothIsPaired()) {
         return 0x00;
     }
-    puts(*data);
+    puts(data);
     return 0x01;
 }
 
-uint8_t BluetoothReceive (char *data)
+unsigned char BluetoothReceive (char *data)
 {
     if (!BluetoothIsPaired()) {
         return 0x00;
     }
     char d [BLUETOOTH_RECEIVE_SIZE];
     char input = getchar();
-    uint8_t length = 0;
+    unsigned char length = 0;
     while (input != BLUETOOTH_DELIMITER && length < BLUETOOTH_RECEIVE_SIZE) {
         d[length++] = input;
         input = getchar();
     }
     data = d;
     return 0x01;
-}
-
-
-uint8_t confirmAcknowledge (char *key, uint8_t size)
-{
-    char input;
-    uint8_t index = 0;
-    uint8_t count = 0;
-
-    while (index < size && count < CONFIRM_ACK_TIMEOUT) {
-        if (*key[index] == getchar()) {
-            index++;
-        } else {
-            index = 0;
-        }
-        count++;
-    }
-
-    return (uint8_t)(count == CONFIRM_ACK_TIMEOUT);
-}
-
-void usartInitialize (void)
-{
-    UBRR0H = UBRRH_VALUE;
-    UBRROL = UBRRL_VALUE;
-
-#if USE_2X
-    UCSR0A |= (1 << U2X0);
-#else
-    UCSR0A &= ~(1 << U2X0);
-#endif
-
-    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);     // 8-bit data
-    UCSR0B = (1 << RXEN0) | (1 << TXEN0);       // Enable RX and TX
-
-    stdout = &USART0_OStream;
-    stdin = &USART0_IStream;
-}
-
-void usart0SendByte (char data, FILE *stream)
-{
-    if (data == '\n') {
-        usart0SendByte('\r', stream);
-    }
-    while (!(UCSR0A & (1 << UDRE0))) ;
-    UDR0 = data;
-    return 0;
-}
-
-char usart0ReceiveByte (FILE *stream)
-{
-    while (!(UCSR0A & (1 << RXC0))) ;
-    return UDR0;
 }
