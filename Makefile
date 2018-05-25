@@ -103,7 +103,7 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
 
 
-./$(BUILDDIR)/%.o: $(SOURCES)
+./$(BUILDDIR)/%.o: ./$(SRCDIR)/%.c
 	@echo " Building file: '$<'..."
 	$(CC) $(CFLAGS) -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -o "$@" "$<"
 	@echo "   Finished building '$<'!"
