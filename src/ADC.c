@@ -1,6 +1,11 @@
+
+#include "ADC.h"
+
+#include <avr/avr/io.h>
+
 void InitializeADC (void)
 {
-    static uint8_t adcInitState = 0x00;
+    static unsigned char adcInitState = 0x00;
 
     if (adcInitState) {
         return;
