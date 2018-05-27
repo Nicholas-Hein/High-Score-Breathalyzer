@@ -10,8 +10,12 @@
 #define MAX_PPM 500
 
 
+#define SAMPLE_COUNT 20
+#define SAMPLE_PERIOD 250
+#define SAMPLE_INFLECTIONPOINT (SAMPLE_COUNT * SAMPLE_PERIOD / 1000.0)
+
 
 void EthanolSensorInitialize (void);
-double EthanolSensorMeasureBAC (void);
+double EthanolSensorMeasureBAC (void (*callback)(double bac));
 
 #endif

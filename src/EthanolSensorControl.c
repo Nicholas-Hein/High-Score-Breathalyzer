@@ -39,7 +39,7 @@ double convertDCToPPM (double v)
     return ppm;
 }
 
-double EthanolSensorMeasureBAC (void)
+double measureBAC (void)
 {
     double v = measureADC() * VREF;
     double ppm = convertDCToPPM(v);
@@ -54,4 +54,30 @@ double EthanolSensorMeasureBAC (void)
         AddScore(bac);
     }
     return bac;
+}
+
+double EthanolSensorMeasureBAC (void (*callback)(double bac))
+{
+    double sumWeightedBAC = 0.0;
+    double sumWeights = 0.0;
+
+    double t;
+    double bac;
+    for (char i = 0; i < SAMPLE_COUNT; i++) {
+        t = (double)i * (double)SAMPLE_PERIOD / 1000.0;
+        bac = measureBAC();
+        if (bac < 0) {
+            return 0.0;
+        }
+
+        double coef = 1.0 / M_PI * atan(t - SAMPLE_INFLECTIONPOINT) + 0.5;
+        bac *= coef;
+        sumWeightedBAC += bac;
+        sumWeights += coef;
+
+        double tempResult = sumWeightedBAC / sumWeights;
+        callback(tempResult);
+    }
+
+    return sumWeightedBAC / sumWeights;
 }

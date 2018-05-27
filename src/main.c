@@ -74,6 +74,11 @@ void unloadScores (void)
     BluetoothSend(overmsg);
 }
 
+void bacProgressCallback (double bac)
+{
+    BluetoothSend(ConvertDouble(&bac));
+}
+
 void ExecuteCommand (char *cmd)
 {
     char *msg = (char *)malloc(BT_COMMAND_MSG_SIZE * sizeof(unsigned char));
@@ -81,7 +86,7 @@ void ExecuteCommand (char *cmd)
         msg = (char [BT_COMMAND_MSG_SIZE]){ ACK, OVER };
         BluetoothSend(msg);
     } else if (cmd[0] == CMD_MEASUREBAC) {
-        double val = EthanolSensorMeasureBAC();
+        double val = EthanolSensorMeasureBAC(&bacProgressCallback);
         BluetoothSend(ConvertDouble(&val));
     } else if (cmd[0] == CMD_MEASUREBAT) {
         double val = PowerSourceMeasureBattery();
