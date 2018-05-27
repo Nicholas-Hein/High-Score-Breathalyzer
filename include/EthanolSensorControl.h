@@ -14,8 +14,14 @@
 #define SAMPLE_PERIOD 250
 #define SAMPLE_INFLECTIONPOINT (SAMPLE_COUNT * SAMPLE_PERIOD / 1000.0)
 
-
+/**
+ * Initializes the ethanol sensor module.
+ */
 void EthanolSensorInitialize (void);
+/**
+ * Measures BAC from the ethanol sensor.
+ * Has a progress callback.
+ */
 double EthanolSensorMeasureBAC (void (*callback)(double bac));
 
 #endif

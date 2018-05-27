@@ -3,6 +3,9 @@
 
 #include <avr/avr/io.h>
 
+/**
+ * Initialize the on-board ADC module for taking measurements.
+ */
 void InitializeADC (void)
 {
     static unsigned char adcInitState = 0x00;

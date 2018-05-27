@@ -4,6 +4,9 @@
 
 #include <avr/avr/io.h>
 
+/**
+ * Initializes the power source control module.
+ */
 void PowerSourceInitialize (void)
 {
     static unsigned char pwrInitState = 0x00;
@@ -17,6 +20,10 @@ void PowerSourceInitialize (void)
     pwrInitState = 0x01;
 }
 
+/**
+ * Measures the battery level.
+ * @return  The battery percent.
+ */
 double PowerSourceMeasureBattery (void)
 {
     ADMUX &= ~(0x0F);       // Select analog channel

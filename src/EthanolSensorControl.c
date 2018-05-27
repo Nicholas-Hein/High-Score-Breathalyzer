@@ -6,6 +6,9 @@
 #include <avr/math.h>
 #include <avr/avr/io.h>
 
+/**
+ * Initializes the ethanol sensor module.
+ */
 void EthanolSensorInitialize (void)
 {
     static unsigned char ethanolInitState = 0x00;
@@ -56,6 +59,11 @@ double measureBAC (void)
     return bac;
 }
 
+/**
+ * Measures BAC from the ethanol sensor module.
+ * @param  callback A callback for progress.
+ * @return          The averaged BAC.
+ */
 double EthanolSensorMeasureBAC (void (*callback)(double bac))
 {
     double sumWeightedBAC = 0.0;

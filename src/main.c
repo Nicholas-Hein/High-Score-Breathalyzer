@@ -20,6 +20,10 @@ int main(void)
     }
 }
 
+/**
+ * Initializes the High-Score-Breathalyzer.
+ * @return  The initialization code.
+ */
 unsigned char Initialize (void)
 {
     unsigned char initcode = 0x00;
@@ -30,6 +34,9 @@ unsigned char Initialize (void)
     return initcode;
 }
 
+/**
+ * Processes upon successful initialization.
+ */
 void Life (void)
 {
     while (1) {
@@ -38,6 +45,9 @@ void Life (void)
     }
 }
 
+/**
+ * Main activities.
+ */
 void Activity (void)
 {
     char *message = (char *)malloc(BT_COMMAND_MSG_SIZE * sizeof(char));
@@ -79,6 +89,10 @@ void bacProgressCallback (double bac)
     BluetoothSend(ConvertDouble(&bac));
 }
 
+/**
+ * Executes a command.
+ * @param cmd The command to be executed.
+ */
 void ExecuteCommand (char *cmd)
 {
     char *msg = (char *)malloc(BT_COMMAND_MSG_SIZE * sizeof(unsigned char));
@@ -100,6 +114,11 @@ void ExecuteCommand (char *cmd)
     free(msg);
 }
 
+/**
+ * Converts a double to its memory segments.
+ * @param  d The double to be converted.
+ * @return   The memory segments of size sizeof(double)
+ */
 char *ConvertDouble (double *d)
 {
     size_t dataSize = sizeof(double) + 1;
@@ -109,6 +128,9 @@ char *ConvertDouble (double *d)
     return data;
 }
 
+/**
+ * Standby activities.
+ */
 void Standby (void)
 {
     while (!BluetoothIsPaired()) {
@@ -117,6 +139,10 @@ void Standby (void)
     }
 }
 
+/**
+ * Processes upon unsuccessful initialization.
+ * @param initcode The unsuccessful initialization code.
+ */
 void Death (unsigned char initcode)
 {
     while (1) {

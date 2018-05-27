@@ -22,14 +22,34 @@
 #define BT_COMMAND_MSG_SIZE 2
 
 
-
+/**
+ * Initializes the High-Score-Breathalyzer.
+ */
 unsigned char Initialize (void);
+/**
+ * Processes upon successful initialization.
+ */
 void Life (void);
+/**
+ * Processes upon unsuccessful initialization.
+ */
 void Death (unsigned char initcode);
+/**
+ * Main activities.
+ */
 void Activity (void);
+/**
+ * Standy activities.
+ */
 void Standby (void);
 
+/**
+ * Executes a command.
+ */
 void ExecuteCommand (char *cmd);
+/**
+ * Converts a double to its memory segments.
+ */
 char *ConvertDouble (double *d);
 
 #endif

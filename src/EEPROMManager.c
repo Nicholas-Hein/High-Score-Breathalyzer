@@ -45,6 +45,10 @@ unsigned char readScore (unsigned char index, double *data)
     return 0x01;
 }
 
+/**
+ * Reads all scores from saved data.
+ * @return  An array of scores of size EEPROM_SCORE_SIZE
+ */
 double *ReadScores (void)
 {
     double *scores = (double *)malloc(EEPROM_SCORE_SIZE * sizeof(double));
@@ -105,6 +109,10 @@ void writeScores (double *scores)
     eepromWrite(lastAddr, EEPROM_END);
 }
 
+/**
+ * Adds a score to the saved data (in order).
+ * @param score The score to be added.
+ */
 void AddScore (double score)
 {
     double *scores = ReadScores();

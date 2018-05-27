@@ -60,7 +60,10 @@ unsigned char confirmAcknowledge (char *key, unsigned char size)
 }
 
 
-
+/**
+ * Initializes the bluetooth module.
+ * @return  The initialization code.
+ */
 unsigned char BluetoothInitialize (void)
 {
     static unsigned char bluetoothInitState = 0x00;
@@ -92,6 +95,10 @@ unsigned char BluetoothInitialize (void)
     return 0x00;
 }
 
+/**
+ * If the bluetooth is paired.
+ * @return  Is bluetooth paired.
+ */
 unsigned char BluetoothIsPaired (void)
 {
     char ack [ACK_BLUETOOTH_PAIRED_LENGTH] = ACK_BLUETOOTH_PAIRED;
@@ -102,6 +109,11 @@ unsigned char BluetoothIsPaired (void)
     return 0x01;
 }
 
+/**
+ * Sends data to the bluetooth module.
+ * @param  data The data to be sent.
+ * @return      Is sent.
+ */
 unsigned char BluetoothSend (char *data)
 {
     if (!BluetoothIsPaired()) {
@@ -111,6 +123,11 @@ unsigned char BluetoothSend (char *data)
     return 0x01;
 }
 
+/**
+ * Receives data from the bluetooth module.
+ * @param  data The data received.
+ * @return      Is received.
+ */
 unsigned char BluetoothReceive (char *data)
 {
     if (!BluetoothIsPaired()) {

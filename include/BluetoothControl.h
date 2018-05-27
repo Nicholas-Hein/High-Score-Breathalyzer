@@ -48,11 +48,22 @@
 #define ACK_BLUETOOTH_PAIRED_LENGTH 3
 
 
-
+/**
+ * Initializes the bluetooth module.
+ */
 unsigned char BluetoothInitialize (void);
+/**
+ * Checks if the bluetooth is paired.
+ */
 unsigned char BluetoothIsPaired (void);
 
-unsigned char BluetoothSend (char *data);
+/**
+ * Sends data to the bluetooth module.
+ */
+char BluetoothSend (char *data);
+/**
+ * Receives data from the bluetooth module.
+ */
 unsigned char BluetoothReceive (char *data);
 
 #endif
