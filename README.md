@@ -50,6 +50,21 @@ However, you can change these settings by modifying some macros in the "./Includ
 #### Ethanol Sensor
 The ethanol sensor consists of the analog MQ-3 paired with a voltage divider, and it is fed into the Atmega8's second analog to digital converter.  It is read into the program and is converted to BAC using a conversion algorithm I found from another breathalyzer project [here](https://www.hackster.io/ShawnHymel/diy_breathalyzer-1efe13).
 
+- [Datasheet](https://cdn.sparkfun.com/datasheets/Sensors/Biometric/MQ-3%20ver1.3%20-%20Manual.pdf)
+
+##### Conversion Algorithm
+Assuming a 4.7kOhm resistor from B1 to GND and a 5V reference voltage.
+```
+Let v = (The measured voltage)
+PPM = 150.4351049 * v^5 - 2244.75988 * v^4 + 13308.5139 * v^3 - 39136.08594 * v^2 + 57082.6258 * v - 32982.05333
+BAC = PPM / 2600
+if BAC < 70
+    BAC = 0
+else if BAC > 500
+    return ERROR
+return BAC
+```
+
 One trick I found after testing this High Score Breathalyzer at multiple parties is since really drunk people (those most likely to get the high score) tend to also drool _a lot_.  In my initial tests, one individual drooled into the MQ-3 sensor which ruined it.  To prevent this problem, I've found it best to use some sort of tubing that directs the air to the MQ-3 instead of just having people blow directly onto it.  Personally, I use the plastic casing of an empty rescue inhaler, but anything that redirects airflow should work.
 
 #### Power Source
