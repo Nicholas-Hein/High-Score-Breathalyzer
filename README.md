@@ -48,7 +48,7 @@ The HC-06 is a widely-used, low power Bluetooth module.  This module is controll
 However, you can change these settings by modifying some macros in the "./Include/BluetoothControl.h" header file.
 
 #### Ethanol Sensor
-The ethanol sensor consists of the analog MQ-3 paired with a voltage divider, and it is fed into the Atmega8's second analog to digital converter.  It is read into the program and is converted to BAC using a conversion algorithm I found from another breathalyzer project [here](https://www.hackster.io/ShawnHymel/diy_breathalyzer-1efe13).
+The ethanol sensor consists of the analog MQ-3 paired with a 4.7kOhm resistor which acts as a voltage divider.  It is then fed into the Atmega8's second analog to digital converter.  It is read into the program and is converted to BAC using a conversion algorithm I found from another breathalyzer project [here](https://www.hackster.io/ShawnHymel/diy_breathalyzer-1efe13).
 
 - [Datasheet](https://cdn.sparkfun.com/datasheets/Sensors/Biometric/MQ-3%20ver1.3%20-%20Manual.pdf)
 
