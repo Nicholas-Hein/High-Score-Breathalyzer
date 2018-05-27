@@ -60,7 +60,7 @@ unsigned char BluetoothIsPaired (void);
 /**
  * Sends data to the bluetooth module.
  */
-char BluetoothSend (char *data);
+unsigned char BluetoothSend (char *data);
 /**
  * Receives data from the bluetooth module.
  */

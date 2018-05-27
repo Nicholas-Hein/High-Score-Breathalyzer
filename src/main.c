@@ -5,6 +5,7 @@
 #include "main.h"
 
 #include <avr/util/delay.h>
+#include <avr/avr/io.h>
 #include <avr/string.h>
 #include <avr/stdlib.h>
 
@@ -31,7 +32,35 @@ unsigned char Initialize (void)
     PowerSourceInitialize();
     EthanolSensorInitialize();
 
+    DDRD |= 0xE0;
+
     return initcode;
+}
+
+void changeStatusLED (unsigned char rgb)
+{
+    rgb &= COLOR_VALUE_MASK;
+
+    if (rgb &= COLOR_RED) {
+        PORTD |= (COLOR_RED << COLOR_PIN_OFFSET);
+    } else {
+        PORTD &= ~(COLOR_RED << COLOR_PIN_OFFSET);
+    }
+    if (rgb &= COLOR_GREEN) {
+        PORTD |= (COLOR_GREEN << COLOR_PIN_OFFSET);
+    } else {
+        PORTD &= ~(COLOR_GREEN << COLOR_PIN_OFFSET);
+    }
+    if (rgb &= COLOR_BLUE) {
+        PORTD |= (COLOR_BLUE << COLOR_PIN_OFFSET);
+    } else {
+        PORTD &= ~(COLOR_BLUE << COLOR_PIN_OFFSET);
+    }
+}
+
+unsigned char getStatusLED (void)
+{
+    return (PORTD & (COLOR_VALUE_MASK << COLOR_PIN_OFFSET)) >> COLOR_PIN_OFFSET;
 }
 
 /**
@@ -50,6 +79,7 @@ void Life (void)
  */
 void Activity (void)
 {
+    changeStatusLED(COLOR_GREEN);
     char *message = (char *)malloc(BT_COMMAND_MSG_SIZE * sizeof(char));
     message = (char [BT_COMMAND_MSG_SIZE]){ ACK, OVER };
     BluetoothSend(message);
@@ -86,6 +116,12 @@ void unloadScores (void)
 
 void bacProgressCallback (double bac)
 {
+    if (getStatusLED() & COLOR_BLUE) {
+        changeStatusLED(COLOR_BLACK);
+    } else {
+        changeStatusLED(COLOR_BLUE);
+    }
+
     BluetoothSend(ConvertDouble(&bac));
 }
 
@@ -133,6 +169,7 @@ char *ConvertDouble (double *d)
  */
 void Standby (void)
 {
+    changeStatusLED(COLOR_YELLOW);
     while (!BluetoothIsPaired()) {
         //Standby
         _delay_ms(STANDBY_TIMEOUT);
@@ -146,15 +183,24 @@ void Standby (void)
 void Death (unsigned char initcode)
 {
     while (1) {
-        if (initcode & (1 << RQST_BLUETOOTH_BAUD_INDEX)) {
-            //BAUD error
-        } else if (initcode & (1 << RQST_BLUETOOTH_NAME_INDEX)) {
-            //Name error
-        } else if (initcode & (1 << RQST_BLUETOOTH_PIN_INDEX)) {
-            //PIN error
+        changeStatusLED(COLOR_RED);
+        char flashCount;
+        if (initcode & ((1 << RQST_BLUETOOTH_BAUD_INDEX)
+                | (1 << RQST_BLUETOOTH_NAME_INDEX)
+                | (1 << RQST_BLUETOOTH_PIN_INDEX))) {
+            // Bluetooth setup error
+            flashCount = ERRFLASH_BTSETUP;
         } else {
-            //Other error
+            // Other error
+            flashCount = ERRFLASH_UNKNOWN;
         }
-        _delay_ms(STANDBY_TIMEOUT);
+
+        for (char i = 0; i < flashCount; i++) {
+            changeStatusLED(COLOR_BLACK);
+            _delay_ms(DEATH_PERIOD);
+            changeStatusLED(COLOR_RED);
+            _delay_ms(DEATH_PERIOD);
+        }
+        _delay_ms(DEATH_TIMEOUT);
     }
 }
