@@ -2,9 +2,11 @@
 #include "ADC.h"
 #include "PowerSourceControl.h"
 
+#include <avr/avr/io.h>
+
 void PowerSourceInitialize (void)
 {
-    static uint8_t pwrInitState = 0x00;
+    static unsigned char pwrInitState = 0x00;
     if (pwrInitState) {
         return;
     }

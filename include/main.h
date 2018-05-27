@@ -19,15 +19,17 @@
 
 #define STANDBY_TIMEOUT 100
 
+#define BT_COMMAND_MSG_SIZE 2
 
 
-void Initialize (void);
+
+unsigned char Initialize (void);
 void Life (void);
-void Death (void);
+void Death (unsigned char initcode);
 void Activity (void);
 void Standby (void);
 
 void ExecuteCommand (char *cmd);
-unsigned char *ConvertDouble (double *d);
+char *ConvertDouble (double *d);
 
 #endif

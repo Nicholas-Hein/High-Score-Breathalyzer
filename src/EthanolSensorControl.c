@@ -4,10 +4,11 @@
 #include "EthanolSensorControl.h"
 
 #include <avr/math.h>
+#include <avr/avr/io.h>
 
 void EthanolSensorInitialize (void)
 {
-    static uint8_t ethanolInitState = 0x00;
+    static unsigned char ethanolInitState = 0x00;
     if (ethanolInitState) {
         return;
     }

@@ -1,4 +1,10 @@
 
+#include "EEPROMManager.h"
+
+#include <avr/avr/io.h>
+#include <avr/stdlib.h>
+#include <avr/string.h>
+
 void eepromWrite (unsigned int addr, unsigned char data)
 {
     // Wait for previous write
@@ -20,16 +26,16 @@ unsigned char eepromRead (unsigned int addr)
     return EEDR;            // Read data
 }
 
-uint8_t readScore (uint8_t index, double *data)
+unsigned char readScore (unsigned char index, double *data)
 {
     unsigned int baseAddr = (EEPROM_START + 1) + sizeof(double) * index;
     unsigned char nextDouble [sizeof(double)];
-    unsigned char data;
+    unsigned char item;
 
-    for (uint8_t i = 0; i < sizeof(double); i++) {
-        data = eepromRead(baseAddr + i);
-        if (data != EEPROM_END) {
-            nextDouble[i] = data;
+    for (unsigned char i = 0; i < sizeof(double); i++) {
+        item = eepromRead(baseAddr + i);
+        if (item != EEPROM_END) {
+            nextDouble[i] = item;
         } else {
             return 0x00;
         }
@@ -41,13 +47,13 @@ uint8_t readScore (uint8_t index, double *data)
 
 double *ReadScores (void)
 {
-    double scores[EEPROM_SCORE_SIZE];
+    double *scores = (double *)malloc(EEPROM_SCORE_SIZE * sizeof(double));
     unsigned char begin = eepromRead(EEPROM_START);
 
     if (begin == EEPROM_BEGIN) {
-        for (uint8_t i = 0; i < EEPROM_SCORE_SIZE; i++) {
+        for (unsigned char i = 0; i < EEPROM_SCORE_SIZE; i++) {
             double val;
-            if (readScore(i, val)) {
+            if (readScore(i, &val)) {
                 scores[i] = val;
             } else {
                 break;
@@ -55,7 +61,7 @@ double *ReadScores (void)
         }
     } else {
         eepromWrite(EEPROM_START, EEPROM_BEGIN);
-        eepromWrite(EEPROM_START + )
+        eepromWrite(EEPROM_START, EEPROM_END);
     }
 
     return scores;
@@ -63,10 +69,10 @@ double *ReadScores (void)
 
 void sortScores (double *scores)
 {
-    uint8_t mindex;
-    for (uint8_t i = 0; i < EEPROM_SCORE_SIZE; i++) {
+    unsigned char mindex;
+    for (unsigned char i = 0; i < EEPROM_SCORE_SIZE; i++) {
         mindex = i;
-        for (uint8_t j = i; j < EEPROM_SCORE_SIZE; j++) {
+        for (unsigned char j = i; j < EEPROM_SCORE_SIZE; j++) {
             if (scores[j] < scores[mindex]) {
                 mindex = j;
             }
@@ -77,13 +83,13 @@ void sortScores (double *scores)
     }
 }
 
-void writeScore (uint8_t index, double score)
+void writeScore (unsigned char index, double score)
 {
-    uint8_t baseAddr = EEPROM_START + sizeof(double) * index + 1;
+    unsigned char baseAddr = EEPROM_START + sizeof(double) * index + 1;
     unsigned char val [sizeof(double)];
     memcpy(val, &score, sizeof(double));
 
-    for (uint8_t i = 0; i < sizeof(double); i++) {
+    for (unsigned char i = 0; i < sizeof(double); i++) {
         eepromWrite(baseAddr + i, val[i]);
     }
 }
@@ -91,19 +97,19 @@ void writeScore (uint8_t index, double score)
 void writeScores (double *scores)
 {
     eepromWrite(EEPROM_START, EEPROM_BEGIN);
-    for (uint8_t i = 0; i < EEPROM_SCORE_SIZE; i++) {
+    for (unsigned char i = 0; i < EEPROM_SCORE_SIZE; i++) {
         writeScore(i, scores[i]);
     }
 
-    uint8_t lastAddr = EEPROM_START + sizeof(double) * EEPROM_SCORE_SIZE + 1;
+    unsigned char lastAddr = EEPROM_START + sizeof(double) * EEPROM_SCORE_SIZE + 1;
     eepromWrite(lastAddr, EEPROM_END);
 }
 
 void AddScore (double score)
 {
     double *scores = ReadScores();
-    sortScores(*scores);
+    sortScores(scores);
     scores[0] = score;
-    sortScores(*scores);
-    writeScores(*scores);
+    sortScores(scores);
+    writeScores(scores);
 }
