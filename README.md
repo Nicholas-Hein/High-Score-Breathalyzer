@@ -36,7 +36,9 @@ On-board is the 8-bit microprocessor, 8kb Flash memory, 1kb SRAM, and 512b EEPRO
 
 #### Bluetooth
 The Bluetooth communication on the high score breathalyzer is done by the HC-06 (I got mine from Amazon):
+
 - [Datasheet](http://silabs.org.ua/bc4/hc06.pdf)
+
 The HC-06 is a widely-used, low power Bluetooth module.  This module is controlled by the Atmega8 via the USART protocol.  The default configuration (as specified in the code):
 
 - BAUD: 9600Hz
