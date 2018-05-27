@@ -28,17 +28,21 @@ Delight your friends by having them compete to set the high score BAC for your b
 
 #### Microcontroller
 At the heart of the board is the **Atmega8** made by Microchip:
+
 - [Atmega8](https://www.microchip.com/wwwproducts/en/ATmega8)
 - [Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2486-8-bit-AVR-microcontroller-ATmega8_L_datasheet.pdf)
+
 On-board is the 8-bit microprocessor, 8kb Flash memory, 1kb SRAM, and 512b EEPROM.  The 512b EEPROM is used to store score data between power cycles.
 
 #### Bluetooth
 The Bluetooth communication on the high score breathalyzer is done by the HC-06 (I got mine from Amazon):
 - [Datasheet](http://silabs.org.ua/bc4/hc06.pdf)
 The HC-06 is a widely-used, low power Bluetooth module.  This module is controlled by the Atmega8 via the USART protocol.  The default configuration (as specified in the code):
+
 - BAUD: 9600Hz
 - Name / ID: "HiScoreBreathalyzer"
 - Pairing code: 0000
+
 However, you can change these settings by modifying some macros in the "./Include/BluetoothControl.h" header file.
 
 #### Ethanol Sensor
