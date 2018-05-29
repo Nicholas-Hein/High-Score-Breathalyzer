@@ -1,9 +1,9 @@
 
 #include "BluetoothControl.h"
 
-#include <avr/stdio.h>
-#include <avr/avr/io.h>
-#include <avr/util/setbaud.h>
+#include <stdio.h>
+#include <avr/io.h>
+#include <util/setbaud.h>
 
 int usart0SendByte (char data, FILE *stream)
 {

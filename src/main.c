@@ -4,10 +4,10 @@
 #include "EEPROMManager.h"
 #include "main.h"
 
-#include <avr/util/delay.h>
-#include <avr/avr/io.h>
-#include <avr/string.h>
-#include <avr/stdlib.h>
+#include <util/delay.h>
+#include <avr/io.h>
+#include <string.h>
+#include <stdlib.h>
 
 int main(void)
 {

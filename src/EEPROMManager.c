@@ -1,9 +1,9 @@
 
 #include "EEPROMManager.h"
 
-#include <avr/avr/io.h>
-#include <avr/stdlib.h>
-#include <avr/string.h>
+#include <avr/io.h>
+#include <stdlib.h>
+#include <string.h>
 
 void eepromWrite (unsigned int addr, unsigned char data)
 {

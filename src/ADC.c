@@ -1,7 +1,7 @@
 
 #include "ADC.h"
 
-#include <avr/avr/io.h>
+#include <avr/io.h>
 
 /**
  * Initialize the on-board ADC module for taking measurements.

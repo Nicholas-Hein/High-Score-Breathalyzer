@@ -2,7 +2,7 @@
 #include "ADC.h"
 #include "PowerSourceControl.h"
 
-#include <avr/avr/io.h>
+#include <avr/io.h>
 
 /**
  * Initializes the power source control module.

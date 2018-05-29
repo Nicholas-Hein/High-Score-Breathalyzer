@@ -3,8 +3,8 @@
 #include "EEPROMManager.h"
 #include "EthanolSensorControl.h"
 
-#include <avr/math.h>
-#include <avr/avr/io.h>
+#include <math.h>
+#include <avr/io.h>
 
 /**
  * Initializes the ethanol sensor module.
